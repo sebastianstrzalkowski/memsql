@@ -1,0 +1,48 @@
+version: '2'
+
+services:
+  memsql1:
+    image: 'memsql/cluster-in-a-box'
+    ports:
+      - 3306:3306
+      - 8080:8080
+    environment:
+      LICENSE_KEY: BGEyZWQyMzYwOThhMjRjMjFiMDQ2OGMwOTYyNDNmZTYxAAAAAAAAAAAEAAAAAAAAAAwwNgIZAP0K/R+ZF/C3TsoPsRg+OIQihN0aa74ZSwIZAOOfvdnhFWhmgASfYN/D/KBG7lwaEHJGkg==
+      START_AFTER_INIT: 'Y'
+    networks:
+      vpcbr:
+        ipv4_address: 10.5.0.11
+
+  memsql2:
+    image: 'memsql/cluster-in-a-box'
+    ports:
+      - 3307:3307
+      - 8090:8080
+    environment:
+      LICENSE_KEY: BGEyZWQyMzYwOThhMjRjMjFiMDQ2OGMwOTYyNDNmZTYxAAAAAAAAAAAEAAAAAAAAAAwwNgIZAP0K/R+ZF/C3TsoPsRg+OIQihN0aa74ZSwIZAOOfvdnhFWhmgASfYN/D/KBG7lwaEHJGkg==
+      START_AFTER_INIT: 'Y'
+    networks:
+      vpcbr:
+        ipv4_address: 10.5.0.15
+
+  postgre:
+    image:  postgres
+    restart: always
+    environment:
+      POSTGRES_PASSWORD: example
+    ports:
+      - 5432:5432
+    networks:
+      vpcbr:
+        ipv4_address: 10.5.0.20
+
+networks:
+  vpcbr:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 10.5.0.0/16
+          gateway: 10.5.0.1
+          aux_addresses:
+            memsql1: 10.5.0.11
+            memsql2: 10.5.0.15
